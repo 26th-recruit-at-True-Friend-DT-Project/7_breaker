@@ -15,7 +15,7 @@
         max-width: 100%;
       }
       #chartdiv {
-        width: 80%;
+        width: 100%;
         height: 600px;
         max-width: 100%;
       }
@@ -77,21 +77,6 @@
       <div class="row">
         <div id="chartcontrols"></div>
         <div id="chartdiv"></div>
-        <div class="col">
-          <div class='my-legend'>
-            <div class='legend-title'>지표순위</div>
-            <div class='legend-scale'>
-              <ul class='legend-labels'>
-                <li><span style='background:#8DD3C7;'></span>미국 소비자물가지수</li>
-                <li><span style='background:#FFFFB3;'></span>미국 ISM 제조업지수</li>
-                <li><span style='background:#BEBADA;'></span>미국 실업률</li>
-                <li><span style='background:#FB8072;'></span>미국 무역수지</li>
-                <li><span style='background:#80B1D3;'></span>미국 소매판매지수</li>
-              </ul>
-            </div>
-            <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -358,28 +343,69 @@
       container: document.getElementById("chartcontrols"),
       stockChart: stockChart,
       controls: [
-        am5stock.IndicatorControl.new(root, {
-          stockChart: stockChart,
-          legend: valueLegend
-        }),
-        am5stock.DateRangeSelector.new(root, {
-          stockChart: stockChart
-        }),
-        seriesSwitcher,
-        am5stock.DrawingControl.new(root, {
-          stockChart: stockChart
-        }),
-        am5stock.ResetControl.new(root, {
-          stockChart: stockChart
-        }),
-        am5stock.SettingsControl.new(root, {
-          stockChart: stockChart
-        })
+        // am5stock.IndicatorControl.new(root, {
+        //   stockChart: stockChart,
+        //   legend: valueLegend
+        // }),
+        // am5stock.DateRangeSelector.new(root, {
+        //   stockChart: stockChart
+        // }),
+        // seriesSwitcher,
+        // am5stock.DrawingControl.new(root, {
+        //   stockChart: stockChart
+        // }),
+        // am5stock.ResetControl.new(root, {
+        //   stockChart: stockChart
+        // }),
+        // am5stock.SettingsControl.new(root, {
+        //   stockChart: stockChart
+        // })
       ]
     })
 
     const pathname = window.location.pathname
-    // const ticker = pathname.split('/').at(-1)
+    const indicator = pathname.split('/').at(-1)
+    let indi_data = []
+
+    fetch(`/api/indicator/`).then((res)=>{return res.json()}).then((get_data)=>{
+        indi_data = convert2indiData(get_data);
+        console.log(indi_data)
+        
+        for(var i = 1; i < indi_data.length; i++) {
+          if(indicator === "cpi") {
+            const val = indi_data[i].cpi
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "CPI YOY: " + val.toFixed(2) + "%" + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "ism") {
+            const val = indi_data[i].ism
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "ISM 제조업지수: " + Intl.NumberFormat('ko-KR').format(val.toFixed(1)) + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "nonfarm") {
+            const val = indi_data[i].nonfarm
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "비농업고용지수: " + Intl.NumberFormat('ko-KR').format(val) + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "retail") {
+            const val = indi_data[i].retail
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "소매판매지수: " + Intl.NumberFormat('ko-KR').format(val) + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "tb") {
+            const val = indi_data[i].tb
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "미국무역수지: " + Intl.NumberFormat('ko-KR').format(val) + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "unem") {
+            const val = indi_data[i].unem
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "실업률: " + val.toFixed(2) + "%" + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "dollar") {
+            const val = indi_data[i].dollar
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "달러 인덱스: " + Intl.NumberFormat('ko-KR').format(val.toFixed(2)) + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+          else if(indicator === "wti") {
+            const val = indi_data[i].wti
+            makeEvent(indi_data[i].date, "P", am5.color(0xffd700), "WTI: " + Intl.NumberFormat('ko-KR').format(val.toFixed(2)) + "\n" + "S&P500: $" + (indi_data[i].sp_close * 10).toFixed(2))
+          }
+        }
+    })
 
     fetch(`/api/snp`).then((res)=>{return res.json()}).then((get_data)=>{
         const data = convert2chartData(get_data);
@@ -404,10 +430,36 @@
                 Volume:d.Volume,
             }
         })
-        console.log(result)
         return result;
     }
 
+    function convert2indiData(data) {
+        const value = data
+        const timelineDataList = []
+        Object.keys(value).forEach(key=>{
+            timelineDataList.push(value[key])
+        })
+        const result = timelineDataList.map(d=>{
+            return {
+                date:Math.floor(d.date/1000000),
+                cpi:d.cpi,
+                ism:d.manufac,
+                nonfarm:d.nonfarm,
+                retail:d.retail,
+                tb:d.tb,
+                unem:d.unem,
+                dollar:d.dollar,
+                wti:d.wti,
+                sp_adj:d.sp_adj,
+                sp_close:d.sp_close,
+                sp_high:d.sp_high,
+                sp_low:d.sp_low,
+                sp_open:d.sp_open,
+                sp_volume:d.sp_volume
+            }
+        })
+        return result;
+    }
 
     var tooltip = am5.Tooltip.new(root, {
       getStrokeFromSprite: false,
