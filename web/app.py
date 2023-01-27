@@ -47,6 +47,11 @@ def example2():
     return render_template('example2.html')
 
 
+@app.route('/example3')
+def example3():
+    return render_template('example3.html')
+
+
 if __name__=='__main__':
     app.run(host='0.0.0.0', debug=True)
 

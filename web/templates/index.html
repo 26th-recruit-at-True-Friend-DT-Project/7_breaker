@@ -19,6 +19,11 @@
         height: 600px;
         max-width: 100%;
       }
+      #chartdiv2 {
+        width: 100%;
+        height: 600px;
+        max-width: 100%
+      }
       h2 {
         margin: 0;
         display: block;
@@ -77,8 +82,9 @@
       <div class="row">
         <div id="chartcontrols"></div>
         <div id="chartdiv"></div>
-        <div class="col">
-          <div class='my-legend'>
+        <div class="col">     
+          <div id="chartdiv2"></div>    
+          <!-- <div class='my-legend'>
             <div class='legend-title'>지표순위</div>
             <div class='legend-scale'>
               <ul class='legend-labels'>
@@ -90,7 +96,7 @@
               </ul>
             </div>
             <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -145,7 +151,8 @@
     // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
     var valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
       renderer: am5xy.AxisRendererY.new(root, {
-        pan: "zoom"
+        opposite: true,
+        pan: "zoom",
       }),
       extraMin: 0.1, // adds some space for for main series
       tooltip: am5.Tooltip.new(root, {}),
@@ -161,6 +168,7 @@
       renderer: am5xy.AxisRendererX.new(root, {}),
       tooltip: am5.Tooltip.new(root, {})
     }));
+
 
     // Add series
     // -------------------------------------------------------------------------------
@@ -454,6 +462,115 @@
         sprite: bullet
       }));
     }});
+
+    //
+
+    am5.ready(function() {
+
+    // Create root element
+    // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+    var root2 = am5.Root.new("chartdiv2");
+
+
+    // Set themes
+    // https://www.amcharts.com/docs/v5/concepts/themes/
+    root2.setThemes([
+      am5themes_Animated.new(root2)
+    ]);
+
+
+    // Create chart
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/
+    var chart = root2.container.children.push(am5xy.XYChart.new(root2, {
+      panX: true,
+      panY: true,
+      wheelX: "panX",
+      wheelY: "zoomX",
+      pinchZoomX:false
+    }));
+
+
+    // Add cursor
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+    var cursor = chart.set("cursor", am5xy.XYCursor.new(root2, {
+      behavior: "none"
+    }));
+    cursor.lineY.set("visible", false);
+
+
+    // Generate random data
+    var date = new Date();
+    date.setHours(0, 0, 0, 0);
+    var value = 100;
+
+    function generateData() {
+      value = Math.round((Math.random() * 10 - 5) + value);
+      am5.time.add(date, "day", 1);
+      return {
+        date: date.getTime(),
+        value: value
+      };
+    }
+
+    function generateDatas(count) {
+      var data = [];
+      for (var i = 0; i < count; ++i) {
+        data.push(generateData());
+      }
+      return data;
+    }
+
+
+    // Create axes
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+    var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root2, {
+      maxDeviation: 0.2,
+      baseInterval: {
+        timeUnit: "day",
+        count: 1
+      },
+      renderer: am5xy.AxisRendererX.new(root2, {}),
+      tooltip: am5.Tooltip.new(root2, {})
+    }));
+
+    var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root2, {
+      renderer: am5xy.AxisRendererY.new(root2, {
+        opposite: true
+      })
+    }));
+
+
+    // Add series
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+    var series = chart.series.push(am5xy.LineSeries.new(root2, {
+      name: "Series",
+      xAxis: xAxis,
+      yAxis: yAxis,
+      valueYField: "value",
+      valueXField: "date",
+      tooltip: am5.Tooltip.new(root2, {
+        labelText: "{valueY}"
+      })
+    }));
+
+
+    // Add scrollbar
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+    chart.set("scrollbarX", am5.Scrollbar.new(root2, {
+      orientation: "horizontal"
+    }));
+
+    // Set data
+    var data = generateDatas(1200);
+    series.data.setAll(data);
+
+
+    // Make stuff animate on load
+    // https://www.amcharts.com/docs/v5/concepts/animations/
+    series.appear(1000);
+    chart.appear(1000, 100);
+
+    }); // end am5.ready()
     </script>
 </body>
 </html>
