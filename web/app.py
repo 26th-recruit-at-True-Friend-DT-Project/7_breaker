@@ -22,6 +22,7 @@ firebase_admin.initialize_app(cred, {
 def test():
     return render_template('test.html')
 
+
 @app.route('/bar')
 def bar():
     return render_template('bar.html')
