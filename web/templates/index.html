@@ -9,20 +9,10 @@
     <link href="../static/images/kis-app.png" rel="icon">
     <title>Indicator</title>
     <style>
-      #chartcontrols {
-        height: auto;
-        padding: 5px 5px 0 16px;
-        max-width: 100%;
-      }
       #chartdiv {
-        width: 80%;
-        height: 600px;
+        width: 95%;
+        height: 800px;
         max-width: 100%;
-      }
-      #chartdiv2 {
-        width: 100%;
-        height: 600px;
-        max-width: 100%
       }
       h2 {
         margin: 0;
@@ -50,14 +40,14 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                <a class="nav-link" aria-current="page" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/">Link</a>
+                <a class="nav-link" href="/bar">Rank</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Choose
+                  Indicator
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="cpi">미국 소비자물가지수</a></li>
@@ -72,32 +62,12 @@
               </li>
             </ul>
           </div>
-          <!-- <a class="navbar-brand">
-            <img src="../static/images/truefriend.png" alt="truefriend" width="100">
-          </a> -->
         </div>
       </nav>      
     </header>
     <div class="container-fluid">
       <div class="row">
-        <div id="chartcontrols"></div>
         <div id="chartdiv"></div>
-        <div class="col">     
-          <div id="chartdiv2"></div>    
-          <!-- <div class='my-legend'>
-            <div class='legend-title'>지표순위</div>
-            <div class='legend-scale'>
-              <ul class='legend-labels'>
-                <li><span style='background:#8DD3C7;'></span>미국 소비자물가지수</li>
-                <li><span style='background:#FFFFB3;'></span>미국 ISM 제조업지수</li>
-                <li><span style='background:#BEBADA;'></span>미국 실업률</li>
-                <li><span style='background:#FB8072;'></span>미국 무역수지</li>
-                <li><span style='background:#80B1D3;'></span>미국 소매판매지수</li>
-              </ul>
-            </div>
-            <div class='legend-source'>Source: <a href="#link to source">Name of source</a></div>
-          </div> -->
-        </div>
       </div>
     </div>
 
@@ -110,464 +80,302 @@
 
     <!-- Chart code -->
     <script>
-    let whiteList = [];
-
     am5.ready(function() {
+
     // Create root element
-    // -------------------------------------------------------------------------------
     // https://www.amcharts.com/docs/v5/getting-started/#Root_element
     var root = am5.Root.new("chartdiv");
 
+
     // Set themes
-    // -------------------------------------------------------------------------------
     // https://www.amcharts.com/docs/v5/concepts/themes/
     root.setThemes([
       am5themes_Animated.new(root)
     ]);
 
-    // Create a stock chart
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
-    var stockChart = root.container.children.push(am5stock.StockChart.new(root, {
-    }));
-
-    // Set global number format
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/
-    root.numberFormatter.set("numberFormat", "#,###.00");
-
-
-    // Create a main stock panel (chart)
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock-chart/#Adding_panels
-    var mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
-      wheelY: "zoomX",
-      panX: true,
-      panY: true
-    }));
-
-    // Create value axis
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-    var valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
-      renderer: am5xy.AxisRendererY.new(root, {
-        opposite: true,
-        pan: "zoom",
-      }),
-      extraMin: 0.1, // adds some space for for main series
-      tooltip: am5.Tooltip.new(root, {}),
-      numberFormat: "#,###.00",
-      extraTooltipPrecision: 2
-    }));
-
-    var dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {
-      baseInterval: {
-        timeUnit: "day",
-        count: 1
-      },
-      renderer: am5xy.AxisRendererX.new(root, {}),
-      tooltip: am5.Tooltip.new(root, {})
-    }));
-
-
-    // Add series
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
-      clustered: false,
-      valueXField: "Date",
-      valueYField: "Close",
-      highValueYField: "High",
-      lowValueYField: "Low",
-      openValueYField: "Open",
-      calculateAggregates: true,
-      xAxis: dateAxis,
-      yAxis: valueAxis,
-      legendValueText: "open: [bold]{openValueY}[/] high: [bold]{highValueY}[/] low: [bold]{lowValueY}[/] close: [bold]{valueY}[/]",
-      legendRangeValueText: ""
-    }));
-
-    // Set main value series
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
-    stockChart.set("stockSeries", valueSeries);
-
-
-    // Add a stock legend
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock-chart/stock-legend/
-    var valueLegend = mainPanel.plotContainer.children.push(am5stock.StockLegend.new(root, {
-      stockChart: stockChart
-    }));
-
-
-    // Create volume axis
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-    var volumeAxisRenderer = am5xy.AxisRendererY.new(root, {
-      inside: true
-    });
-
-    volumeAxisRenderer.labels.template.set("forceHidden", true);
-    volumeAxisRenderer.grid.template.set("forceHidden", true);
-
-    var volumeValueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
-      numberFormat: "#.#a",
-      height: am5.percent(20),
-      y: am5.percent(100),
-      centerY: am5.percent(100),
-      renderer: volumeAxisRenderer
-    }));
-
-    // Add series
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var volumeSeries = mainPanel.series.push(am5xy.ColumnSeries.new(root, {
-      name: "Volume",
-      clustered: false,
-      valueXField: "Date",
-      valueYField: "Volume",
-      xAxis: dateAxis,
-      yAxis: volumeValueAxis,
-      legendValueText: "[bold]{valueY.formatNumber('#,###.0a')}[/]"
-    }));
-
-    volumeSeries.columns.template.setAll({
-      strokeOpacity: 0,
-      fillOpacity: 0.5
-    });
-
-    // color columns by stock rules
-    volumeSeries.columns.template.adapters.add("fill", function(fill, target) {
-      var dataItem = target.dataItem;
-      if (dataItem) {
-        return stockChart.getVolumeColor(dataItem);
-      }
-      return fill;
-    })
-
-
-    // Set main series
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
-    stockChart.set("volumeSeries", volumeSeries);
-    valueLegend.data.setAll([valueSeries, volumeSeries]);
-
-
-    // Add cursor(s)
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-    mainPanel.set("cursor", am5xy.XYCursor.new(root, {
-      yAxis: valueAxis,
-      xAxis: dateAxis,
-      snapToSeries: [valueSeries],
-      snapToSeriesBy: "y!"
-    }));
-
-
-    // Add scrollbar
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-    var scrollbar = mainPanel.set("scrollbarX", am5xy.XYChartScrollbar.new(root, {
-      orientation: "horizontal",
-      height: 50
-    }));
-    stockChart.toolsContainer.children.push(scrollbar);
-
-    var sbDateAxis = scrollbar.chart.xAxes.push(am5xy.GaplessDateAxis.new(root, {
-      baseInterval: {
-        timeUnit: "day",
-        count: 1
-      },
-      renderer: am5xy.AxisRendererX.new(root, {})
-    }));
-
-    var sbValueAxis = scrollbar.chart.yAxes.push(am5xy.ValueAxis.new(root, {
-      renderer: am5xy.AxisRendererY.new(root, {})
-    }));
-
-    var sbSeries = scrollbar.chart.series.push(am5xy.LineSeries.new(root, {
-      valueYField: "Close",
-      valueXField: "Date",
-      xAxis: sbDateAxis,
-      yAxis: sbValueAxis
-    }));
-
-    sbSeries.fills.template.setAll({
-      visible: true,
-      fillOpacity: 0.3
-    });
-
-    // Set up series type switcher
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock/toolbar/series-type-control/
-    var seriesSwitcher = am5stock.SeriesTypeControl.new(root, {
-      stockChart: stockChart
-    });
-
-    seriesSwitcher.events.on("selected", function(ev) {
-      setSeriesType(ev.item.id);
-    });
-
-    function getNewSettings(series) {
-      var newSettings = [];
-      am5.array.each(["name", "valueYField", "highValueYField", "lowValueYField", "openValueYField", "calculateAggregates", "valueXField", "xAxis", "yAxis", "legendValueText", "stroke", "fill"], function(setting) {
-        newSettings[setting] = series.get(setting);
-      });
-      return newSettings;
-    }
-
-    function setSeriesType(seriesType) {
-      // Get current series and its settings
-      var currentSeries = stockChart.get("stockSeries");
-      var newSettings = getNewSettings(currentSeries);
-
-      // Remove previous series
-      var data = currentSeries.data.values;
-      mainPanel.series.removeValue(currentSeries);
-
-      // Create new series
-      var series;
-      switch (seriesType) {
-        case "line":
-          series = mainPanel.series.push(am5xy.LineSeries.new(root, newSettings));
-          break;
-        case "candlestick":
-        case "procandlestick":
-          newSettings.clustered = false;
-          series = mainPanel.series.push(am5xy.CandlestickSeries.new(root, newSettings));
-          if (seriesType == "procandlestick") {
-            series.columns.template.get("themeTags").push("pro");
-          }
-          break;
-        case "ohlc":
-          newSettings.clustered = false;
-          series = mainPanel.series.push(am5xy.OHLCSeries.new(root, newSettings));
-          break;
-      }
-
-      // Set new series as stockSeries
-      if (series) {
-        valueLegend.data.removeValue(currentSeries);
-        series.data.setAll(data);
-        stockChart.set("stockSeries", series);
-        var cursor = mainPanel.get("cursor");
-        if (cursor) {
-          cursor.set("snapToSeries", [series]);
-        }
-        valueLegend.data.insertIndex(0, series);
-      }
-    }
-
-
-    // Stock toolbar
-    // -------------------------------------------------------------------------------
-    // https://www.amcharts.com/docs/v5/charts/stock/toolbar/
-    var toolbar = am5stock.StockToolbar.new(root, {
-      container: document.getElementById("chartcontrols"),
-      stockChart: stockChart,
-      controls: [
-        am5stock.IndicatorControl.new(root, {
-          stockChart: stockChart,
-          legend: valueLegend
-        }),
-        am5stock.DateRangeSelector.new(root, {
-          stockChart: stockChart
-        }),
-        seriesSwitcher,
-        am5stock.DrawingControl.new(root, {
-          stockChart: stockChart
-        }),
-        am5stock.ResetControl.new(root, {
-          stockChart: stockChart
-        }),
-        am5stock.SettingsControl.new(root, {
-          stockChart: stockChart
-        })
-      ]
-    })
-
-    const pathname = window.location.pathname
-    // const ticker = pathname.split('/').at(-1)
-
-    fetch(`/api/snp`).then((res)=>{return res.json()}).then((get_data)=>{
-        const data = convert2chartData(get_data);
-        valueSeries.data.setAll(data);
-        volumeSeries.data.setAll(data);
-        sbSeries.data.setAll(data);
-    })
-
-    function convert2chartData(data) {
-        const value = data
-        const timelineDataList = []
-        Object.keys(value).forEach(key=>{
-            timelineDataList.push(value[key])
-        })
-        const result = timelineDataList.map(d=>{
-            return {
-                Date:Math.floor(d.date/1000000),
-                Open:d.Open * 10,
-                Close:d.Close * 10,
-                High:d.High * 10,
-                Low:d.Low * 10,
-                Volume:d.Volume,
-            }
-        })
-        console.log(result)
-        return result;
-    }
-
-
-    var tooltip = am5.Tooltip.new(root, {
-      getStrokeFromSprite: false,
-      getFillFromSprite: false
-    });
-
-    tooltip.get("background").setAll({
-      strokeOpacity: 1,
-      stroke: am5.color(0x000000),
-      fillOpacity: 1,
-      fill: am5.color(0xffffff)
-    });
-
-
-    function makeEvent(date, letter, color, description) {
-      var dataItem = dateAxis.createAxisRange(dateAxis.makeDataItem({ value: date }))
-      var grid = dataItem.get("grid");
-      if (grid) {
-        grid.setAll({ visible: true, strokeOpacity: 0.2, strokeDasharray: [3, 3] })
-      }
-
-      var bullet = am5.Container.new(root, {
-        dy: -100
-      });
-
-      var circle = bullet.children.push(am5.Circle.new(root, {
-        radius: 10,
-        stroke: color,
-        fill: am5.color(0xffffff),
-        tooltipText: description,
-        tooltip: tooltip,
-        tooltipY: 0
-      }));
-
-      var label = bullet.children.push(am5.Label.new(root, {
-        text: letter,
-        centerX: am5.p50,
-        centerY: am5.p50
-      }));
-
-      dataItem.set("bullet", am5xy.AxisBullet.new(root, {
-        location: 0,
-        stacked: true,
-        sprite: bullet
-      }));
-    }});
-
-    //
-
-    am5.ready(function() {
-
-    // Create root element
-    // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-    var root2 = am5.Root.new("chartdiv2");
-
-
-    // Set themes
-    // https://www.amcharts.com/docs/v5/concepts/themes/
-    root2.setThemes([
-      am5themes_Animated.new(root2)
-    ]);
-
 
     // Create chart
     // https://www.amcharts.com/docs/v5/charts/xy-chart/
-    var chart = root2.container.children.push(am5xy.XYChart.new(root2, {
-      panX: true,
-      panY: true,
-      wheelX: "panX",
-      wheelY: "zoomX",
-      pinchZoomX:false
+    var chart = root.container.children.push(am5xy.XYChart.new(root, {
+      panX: false,
+      panY: false,
+      wheelX: "none",
+      wheelY: "none",
+      layout: root.verticalLayout
     }));
 
 
-    // Add cursor
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-    var cursor = chart.set("cursor", am5xy.XYCursor.new(root2, {
-      behavior: "none"
-    }));
-    cursor.lineY.set("visible", false);
+    // Create axes and their renderers
+    var yRenderer = am5xy.AxisRendererY.new(root, {
+      visible: false,
+      minGridDistance: 20,
+      inversed: true
+    });
 
+    yRenderer.grid.template.set("visible", false);
 
-    // Generate random data
-    var date = new Date();
-    date.setHours(0, 0, 0, 0);
-    var value = 100;
-
-    function generateData() {
-      value = Math.round((Math.random() * 10 - 5) + value);
-      am5.time.add(date, "day", 1);
-      return {
-        date: date.getTime(),
-        value: value
-      };
-    }
-
-    function generateDatas(count) {
-      var data = [];
-      for (var i = 0; i < count; ++i) {
-        data.push(generateData());
-      }
-      return data;
-    }
-
-
-    // Create axes
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-    var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root2, {
-      maxDeviation: 0.2,
-      baseInterval: {
-        timeUnit: "day",
-        count: 1
-      },
-      renderer: am5xy.AxisRendererX.new(root2, {}),
-      tooltip: am5.Tooltip.new(root2, {})
+    var yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root, {
+      maxDeviation: 0,
+      renderer: yRenderer,
+      categoryField: "country"
     }));
 
-    var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root2, {
-      renderer: am5xy.AxisRendererY.new(root2, {
-        opposite: true
-      })
+    var xRenderer = am5xy.AxisRendererX.new(root, {
+      visible: false,
+      minGridDistance: 30,
+      opposite:true
+    });
+
+    xRenderer.grid.template.set("visible", false);
+
+    var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+      renderer: xRenderer,
+      categoryField: "indicator"
     }));
 
 
-    // Add series
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-    var series = chart.series.push(am5xy.LineSeries.new(root2, {
-      name: "Series",
+    // Create series
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/#Adding_series
+    var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+      calculateAggregates: true,
+      stroke: am5.color(0xffffff),
+      clustered: false,
       xAxis: xAxis,
       yAxis: yAxis,
-      valueYField: "value",
-      valueXField: "date",
-      tooltip: am5.Tooltip.new(root2, {
-        labelText: "{valueY}"
-      })
+      categoryXField: "indicator",
+      categoryYField: "country",
+      valueField: "value"
     }));
 
+    series.columns.template.setAll({
+      tooltipText: "{value}",
+      strokeOpacity: 1,
+      strokeWidth: 2,
+      width: am5.percent(100),
+      height: am5.percent(100)
+    });
 
-    // Add scrollbar
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-    chart.set("scrollbarX", am5.Scrollbar.new(root2, {
-      orientation: "horizontal"
+    series.columns.template.events.on("pointerover", function(event) {
+      var di = event.target.dataItem;
+      if (di) {
+        heatLegend.showValue(di.get("value", 0));
+      }
+    });
+
+    series.events.on("datavalidated", function() {
+      heatLegend.set("startValue", series.getPrivate("valueHigh"));
+      heatLegend.set("endValue", series.getPrivate("valueLow"));
+    });
+
+
+    // Set up heat rules
+    // https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+    series.set("heatRules", [{
+      target: series.columns.template,
+      min: am5.color(0xe6e6ff),
+      max: am5.color(0x4d4dff),
+      dataField: "value",
+      key: "fill"
+    }]);
+
+
+    // Add heat legend
+    // https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
+    var heatLegend = chart.bottomAxesContainer.children.push(am5.HeatLegend.new(root, {
+      orientation: "horizontal",
+      endColor: am5.color(0xe6e6ff),
+      startColor: am5.color(0x4d4dff)
     }));
+
 
     // Set data
-    var data = generateDatas(1200);
+    // https://www.amcharts.com/docs/v5/charts/xy-chart/#Setting_data
+    var data = [{
+      indicator: "1",
+      country: "U.S.A",
+      value: 2990
+    }, {
+      indicator: "2",
+      country: "U.S.A",
+      value: 2520
+    }, {
+      indicator: "3",
+      country: "U.S.A",
+      value: 2334
+    }, {
+      indicator: "4",
+      country: "U.S.A",
+      value: 2230
+    }, {
+      indicator: "5",
+      country: "U.S.A",
+      value: 2325
+    }, {
+      indicator: "6",
+      country: "U.S.A",
+      value: 2019
+    }, {
+      indicator: "7",
+      country: "U.S.A",
+      value: 2128
+    }, {
+      indicator: "8",
+      country: "U.S.A",
+      value: 2246
+    }, {
+      indicator: "1",
+      country: "Europe",
+      value: 2421
+    }, {
+      indicator: "2",
+      country: "Europe",
+      value: 2788
+    }, {
+      indicator: "3",
+      country: "Europe",
+      value: 2959
+    }, {
+      indicator: "4",
+      country: "Europe",
+      value: 3018
+    }, {
+      indicator: "5",
+      country: "Europe",
+      value: 3154
+    }, {
+      indicator: "6",
+      country: "Europe",
+      value: 3172
+    }, {
+      indicator: "7",
+      country: "Europe",
+      value: 5333
+    }, {
+      indicator: "8",
+      country: "Europe",
+      value: 3464
+    }, {
+      indicator: "1",
+      country: "China",
+      value: 3746
+    }, {
+      indicator: "2",
+      country: "China",
+      value: 3656
+    }, {
+      indicator: "3",
+      country: "China",
+      value: 3336
+    }, {
+      indicator: "4",
+      country: "China",
+      value: 3292
+    }, {
+      indicator: "5",
+      country: "China",
+      value: 3269
+    }, {
+      indicator: "6",
+      country: "China",
+      value: 3300
+    }, {
+      indicator: "7",
+      country: "China",
+      value: 3403
+    }, {
+      indicator: "8",
+      country: "China",
+      value: 3323
+    }, {
+      indicator: "1",
+      country: "Japan",
+      value: 3346
+    }, {
+      indicator: "2",
+      country: "Japan",
+      value: 2725
+    }, {
+      indicator: "3",
+      country: "Japan",
+      value: 3052
+    }, {
+      indicator: "4",
+      country: "Japan",
+      value: 3876
+    }, {
+      indicator: "5",
+      country: "Japan",
+      value: 4453
+    }, {
+      indicator: "6",
+      country: "Japan",
+      value: 3972
+    }, {
+      indicator: "7",
+      country: "Japan",
+      value: 4644
+    }, {
+      indicator: "8",
+      country: "Japan",
+      value: 5715
+    }, {
+      indicator: "1",
+      country: "Korea",
+      value: 7080
+    }, {
+      indicator: "2",
+      country: "Korea",
+      value: 8022
+    }, {
+      indicator: "3",
+      country: "Korea",
+      value: 8446
+    }, {
+      indicator: "4",
+      country: "Korea",
+      value: 9313
+    }, {
+      indicator: "5",
+      country: "Korea",
+      value: 9011
+    }, {
+      indicator: "6",
+      country: "Korea",
+      value: 8508
+    }, {
+      indicator: "7",
+      country: "Korea",
+      value: 8515
+    }, {
+      indicator: "8",
+      country: "Korea",
+      value: 8399
+    },
+    ]
+
     series.data.setAll(data);
 
+    yAxis.data.setAll([
+      { country: "U.S.A" },
+      { country: "Europe" },
+      { country: "China" },
+      { country: "Japan" },
+      { country: "Korea" },
+    ]);
+
+    xAxis.data.setAll([
+      { indicator: "1" },
+      { indicator: "2" },
+      { indicator: "3" },
+      { indicator: "4" },
+      { indicator: "5" },
+      { indicator: "6" },
+      { indicator: "7" },
+      { indicator: "8" },
+    ]);
 
     // Make stuff animate on load
-    // https://www.amcharts.com/docs/v5/concepts/animations/
-    series.appear(1000);
+    // https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
     chart.appear(1000, 100);
 
     }); // end am5.ready()
