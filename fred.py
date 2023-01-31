@@ -17,7 +17,7 @@ ref = db.reference()  # db 위치 지정
 
 fp.api_key = '7075573c867961525db950833780fc8a'
 enddate = (datetime.now() + timedelta(days=-1)).strftime('%Y-%m-%d')
-spy = fdr.DataReader('SPY', '2007-10-01', enddate)  # S&P500 '93.1.29 - 오늘 1일단위(주말 제외)
+spy = fdr.DataReader('SPY', '2017-10-01', enddate)  # S&P500 '93.1.29 - 오늘 1일단위(주말 제외)
 corecpi = fp.series('CPILFESL',enddate)             # CPI
 cpiyoy = corecpi.apc().data
 unemploy = fp.series('UNRATE',enddate)              # 실업률 '48.1.1 - '22.12.1 1개월단위 #결측치 0
@@ -33,9 +33,10 @@ wti = fp.series('WTISPLC', enddate)                 # WTI '46.1.1 - '22.12.1 1�
 
 #결측치 처리
 manufac_2 = manufac.data.fillna(method='ffill')
+
 X = pd.concat([cpiyoy, unemploy.data, manufac_2, nonfarm.data, tb.data, dollar.data, retail.data, wti.data], axis = 1)
 X_0 = pd.concat([spy, X], axis=1, join='inner')
-X_1 = X_0.loc['2007-10-01':enddate]
+X_1 = X_0.loc['2017-10-01':enddate]
 X_2 = X_1.fillna(method='ffill')
 X_3 = X_2.fillna(method='bfill')
 X_3.columns = ['sp_open', 'sp_high', 'sp_low', 'sp_close', 'sp_adj', 'sp_volume', 'cpi', 'unem', 'manufac', 'nonfarm', 'tb', 'dollar', 'retail', 'wti']
@@ -59,12 +60,12 @@ df_spy.insert(0, 'date', spy_date)
 data1 = df_spy.to_dict(orient='index')
 data2 = X_3.to_dict(orient='index')
 
-# ref = db.reference('S&P500')
-# for i in range(len(data1)):
-#     ref.update({i: data1[i]})
-
-ref = db.reference('Indicator')
-for i in range(len(data2)):
-    ref.update({i: data2[i]})
+ref = db.reference('S&P500')
+for i in range(len(data1)):
+    ref.update({i: data1[i]})
+#
+# ref = db.reference('Indicator')
+# for i in range(len(data2)):
+#     ref.update({i: data2[i]})
 
 

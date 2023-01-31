@@ -12,20 +12,15 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://breaker-a66d4-default-rtdb.asia-southeast1.firebasedatabase.app/'
 })
 
-#
-# @app.route('/')
-# def home():
-#     return render_template('index.html')
-
 
 @app.route('/')
-def test():
-    return render_template('test.html')
-
-
-@app.route('/bar')
-def bar():
+def home():
     return render_template('bar.html')
+
+
+@app.route('/corr')
+def bar():
+    return render_template('index.html')
 
 
 @app.route("/<string:indicator>", methods=['GET'])
@@ -47,19 +42,17 @@ def indi_data():
     return data
 
 
-@app.route('/example')
-def example():
-    return render_template('example.html')
-
-
-@app.route('/example2')
-def example2():
-    return render_template('example2.html')
-
-
-@app.route('/example3')
-def example3():
-    return render_template('example3.html')
+@app.route('/api/')
+def api_data():
+    ref = db.reference()
+    data = []
+    temp1 = ref.child('spy').get()
+    temp2 = ref.child('ssec').get()
+    temp3 = ref.child('stoxx').get()
+    data.append(temp1)
+    data.append(temp2)
+    data.append(temp3)
+    return data
 
 
 if __name__ == '__main__':

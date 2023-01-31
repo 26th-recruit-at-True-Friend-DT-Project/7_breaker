@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <link href="../static/images/kis-app.png" rel="icon">
-    <title>Indicator</title>
+    <title>한국투자증권</title>
     <style>
       #chartdiv {
         width: 95%;
@@ -33,21 +33,21 @@
     <header id="header">
       <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark" data-bs-theme="dark">
         <div class="container-fluid">
-          <a class="navbar-brand">Navbar</a>
+          <a class="navbar-brand">한국투자증권</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/">Home</a>
+                <a class="nav-link" href="/">지표순위</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/bar">Rank</a>
+                <a class="nav-link" aria-current="page" href="/corr">지표분석</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Indicator
+                  차트분석
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="cpi">미국 소비자물가지수</a></li>
@@ -178,7 +178,6 @@
       key: "fill"
     }]);
 
-
     // Add heat legend
     // https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
     var heatLegend = chart.bottomAxesContainer.children.push(am5.HeatLegend.new(root, {
@@ -187,191 +186,41 @@
       startColor: am5.color(0x4d4dff)
     }));
 
+   
+    fetch(`/api`).then((res)=>{return res.json()}).then((get_data)=>{
+      var data = []
+      data.push({indicator: "CPI", country: "S&P500", value: Math.abs(get_data[0][1]['spy'])})
+      data.push({indicator: "Unemployment", country: "S&P500", value: Math.abs(get_data[0][2]['spy'])})
+      data.push({indicator: "Trade Balance", country: "S&P500", value: Math.abs(get_data[0][3]['spy'])})
+      data.push({indicator: "Currency Index", country: "S&P500", value: Math.abs(get_data[0][4]['spy'])})
+      data.push({indicator: "Retail", country: "S&P500", value: Math.abs(get_data[0][5]['spy'])})
+      data.push({indicator: "CPI", country: "SSEC", value: Math.abs(get_data[1][1]['ssec'])})
+      data.push({indicator: "Unemployment", country: "SSEC", value: Math.abs(get_data[1][2]['ssec'])})
+      data.push({indicator: "Trade Balance", country: "SSEC", value: Math.abs(get_data[1][3]['ssec'])})
+      data.push({indicator: "Currency Index", country: "SSEC", value: Math.abs(get_data[1][4]['ssec'])})
+      data.push({indicator: "Retail", country: "SSEC", value: Math.abs(get_data[1][5]['ssec'])})
+      data.push({indicator: "CPI", country: "STOXX", value: Math.abs(get_data[2][1]['stoxx'])})
+      data.push({indicator: "Unemployment", country: "STOXX", value: Math.abs(get_data[2][2]['stoxx'])})
+      data.push({indicator: "Trade Balance", country: "STOXX", value: Math.abs(get_data[2][3]['stoxx'])})
+      data.push({indicator: "Currency Index", country: "STOXX", value: Math.abs(get_data[2][4]['stoxx'])})
+      data.push({indicator: "Retail", country: "STOXX", value: Math.abs(get_data[2][5]['stoxx'])})
 
-    // Set data
-    // https://www.amcharts.com/docs/v5/charts/xy-chart/#Setting_data
-    var data = [{
-      indicator: "1",
-      country: "U.S.A",
-      value: 2990
-    }, {
-      indicator: "2",
-      country: "U.S.A",
-      value: 2520
-    }, {
-      indicator: "3",
-      country: "U.S.A",
-      value: 2334
-    }, {
-      indicator: "4",
-      country: "U.S.A",
-      value: 2230
-    }, {
-      indicator: "5",
-      country: "U.S.A",
-      value: 2325
-    }, {
-      indicator: "6",
-      country: "U.S.A",
-      value: 2019
-    }, {
-      indicator: "7",
-      country: "U.S.A",
-      value: 2128
-    }, {
-      indicator: "8",
-      country: "U.S.A",
-      value: 2246
-    }, {
-      indicator: "1",
-      country: "Europe",
-      value: 2421
-    }, {
-      indicator: "2",
-      country: "Europe",
-      value: 2788
-    }, {
-      indicator: "3",
-      country: "Europe",
-      value: 2959
-    }, {
-      indicator: "4",
-      country: "Europe",
-      value: 3018
-    }, {
-      indicator: "5",
-      country: "Europe",
-      value: 3154
-    }, {
-      indicator: "6",
-      country: "Europe",
-      value: 3172
-    }, {
-      indicator: "7",
-      country: "Europe",
-      value: 5333
-    }, {
-      indicator: "8",
-      country: "Europe",
-      value: 3464
-    }, {
-      indicator: "1",
-      country: "China",
-      value: 3746
-    }, {
-      indicator: "2",
-      country: "China",
-      value: 3656
-    }, {
-      indicator: "3",
-      country: "China",
-      value: 3336
-    }, {
-      indicator: "4",
-      country: "China",
-      value: 3292
-    }, {
-      indicator: "5",
-      country: "China",
-      value: 3269
-    }, {
-      indicator: "6",
-      country: "China",
-      value: 3300
-    }, {
-      indicator: "7",
-      country: "China",
-      value: 3403
-    }, {
-      indicator: "8",
-      country: "China",
-      value: 3323
-    }, {
-      indicator: "1",
-      country: "Japan",
-      value: 3346
-    }, {
-      indicator: "2",
-      country: "Japan",
-      value: 2725
-    }, {
-      indicator: "3",
-      country: "Japan",
-      value: 3052
-    }, {
-      indicator: "4",
-      country: "Japan",
-      value: 3876
-    }, {
-      indicator: "5",
-      country: "Japan",
-      value: 4453
-    }, {
-      indicator: "6",
-      country: "Japan",
-      value: 3972
-    }, {
-      indicator: "7",
-      country: "Japan",
-      value: 4644
-    }, {
-      indicator: "8",
-      country: "Japan",
-      value: 5715
-    }, {
-      indicator: "1",
-      country: "Korea",
-      value: 7080
-    }, {
-      indicator: "2",
-      country: "Korea",
-      value: 8022
-    }, {
-      indicator: "3",
-      country: "Korea",
-      value: 8446
-    }, {
-      indicator: "4",
-      country: "Korea",
-      value: 9313
-    }, {
-      indicator: "5",
-      country: "Korea",
-      value: 9011
-    }, {
-      indicator: "6",
-      country: "Korea",
-      value: 8508
-    }, {
-      indicator: "7",
-      country: "Korea",
-      value: 8515
-    }, {
-      indicator: "8",
-      country: "Korea",
-      value: 8399
-    },
-    ]
-
-    series.data.setAll(data);
+      console.log(data)
+      series.data.setAll(data);
+    })
 
     yAxis.data.setAll([
-      { country: "U.S.A" },
-      { country: "Europe" },
-      { country: "China" },
-      { country: "Japan" },
-      { country: "Korea" },
+      { country: "S&P500" },
+      { country: "SSEC" },
+      { country: "STOXX" },
     ]);
 
     xAxis.data.setAll([
-      { indicator: "1" },
-      { indicator: "2" },
-      { indicator: "3" },
-      { indicator: "4" },
-      { indicator: "5" },
-      { indicator: "6" },
-      { indicator: "7" },
-      { indicator: "8" },
+      { indicator: "CPI" },
+      { indicator: "Unemployment" },
+      { indicator: "Trade Balance" },
+      { indicator: "Currency Index" },
+      { indicator: "Retail" },
     ]);
 
     // Make stuff animate on load
