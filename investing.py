@@ -51,6 +51,12 @@ ch_tb = fp.series('BPBLTD01CNQ637S', enddate)  # 무역수지 '98.1.1 - '13.4.1 
 yuan = fp.series('DEXCHUS', enddate)  # 위안화지수 '81.1.1 - '23.1.20 1일 단위
 ch_retail = fp.series('CHNSLRTTO02MLM', enddate)  # 소매판매지수 '93.1.1 - '22.7.1 1개월 단위
 
+print(ch_cpi.data.index)
+print(ch_unem.data.index)
+print(ch_tb.data.index)
+print(yuan.data.index)
+print(ch_retail.data.index)
+
 # 유럽 지표
 stoxx = pd.read_csv('./Euro.csv')
 stoxx = stoxx.set_index(keys='날짜')
@@ -75,9 +81,8 @@ X = pd.concat([us_cpiyoy, us_unemploy.data, us_tb.data, dollar.data, us_retail.d
 Y = pd.concat([ch_cpi.data, ch_unem.data, ch_tb.data, yuan.data, ch_retail.data], axis=1)
 Z = pd.concat([eu_cpiyoy, eu_unem.data, eu_tb.data, euro.data, eu_retail.data], axis=1)
 
-
 X_1 = pd.concat([spy, X], axis=1, join='outer')
-X_1 = X_1.loc['2017-10-03':enddate]
+X_1 = X_1.loc['2022-02-01':'2022-08-01']
 
 Y_1 = pd.concat([ssec, Y], axis=1, join='outer')
 Z_1 = pd.concat([stoxx, Z], axis=1, join='outer')
@@ -95,29 +100,32 @@ X_3.columns = ['spy', 'us_cpi', 'us_unemployment', 'us_trade_balance', 'dollar_i
 Y_3.columns = ['ssec', 'ch_cpi', 'ch_unemployment', 'ch_trade_balance', 'yuan_index', 'ch_retail']
 Z_3.columns = ['stoxx', 'eu_cpi', 'eu_unemployment', 'eu_trade_balance', 'euro_index', 'eu_retail']
 
+print(X_3.corr())
+print(Y_3.corr())
+
 A1 = X_3.corr()[['spy']]
 A1.reset_index(inplace=True)
 del A1['index']
 A1 = A1.to_dict(orient='index')
-
-A2 = Y_3.corr()[['ssec']]
-A2.reset_index(inplace=True)
-del A2['index']
-A2 = A2.to_dict(orient='index')
-
-A3 = Z_3.corr()[['stoxx']]
-A3.reset_index(inplace=True)
-del A3['index']
-A3 = A3.to_dict(orient='index')
-
+#
+# A2 = Y_3.corr()[['ssec']]
+# A2.reset_index(inplace=True)
+# del A2['index']
+# A2 = A2.to_dict(orient='index')
+#
+# A3 = Z_3.corr()[['stoxx']]
+# A3.reset_index(inplace=True)
+# del A3['index']
+# A3 = A3.to_dict(orient='index')
+#
 ref = db.reference('spy')
 for i in range(len(A1)):
     ref.update({i: A1[i]})
-
-ref = db.reference('ssec')
-for i in range(len(A2)):
-    ref.update({i: A2[i]})
-
-ref = db.reference('stoxx')
-for i in range(len(A3)):
-    ref.update({i: A3[i]})
+#
+# ref = db.reference('ssec')
+# for i in range(len(A2)):
+#     ref.update({i: A2[i]})
+#
+# ref = db.reference('stoxx')
+# for i in range(len(A3)):
+#     ref.update({i: A3[i]})

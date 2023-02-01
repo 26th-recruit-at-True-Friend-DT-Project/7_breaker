@@ -156,6 +156,7 @@
     });
 
     fetch(`/api`).then((res)=>{return res.json()}).then((get_data)=>{
+      console.log(get_data)
       var data = []
       data.push({"network": "S&P500 with CPI", "value": Math.abs(get_data[0][1]['spy'])})
       data.push({"network": "S&P500 with Unemployment", value: Math.abs(get_data[0][2]['spy'])})
@@ -172,7 +173,6 @@
       data.push({"network": "STOXX with Trade Balance", value: Math.abs(get_data[2][3]['stoxx'])})
       data.push({"network": "STOXX with Currency Index", value: Math.abs(get_data[2][4]['stoxx'])})
       data.push({"network": "STOXX with Retail", value: Math.abs(get_data[2][5]['stoxx'])})
-
       console.log(data)
       yAxis.data.setAll(data);
       series.data.setAll(data);
